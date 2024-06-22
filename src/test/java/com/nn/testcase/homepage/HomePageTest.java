@@ -10,7 +10,7 @@ import java.security.GeneralSecurityException;
 
 public class HomePageTest extends BaseTest {
 
-    @Test(priority = 1,dataProvider = "siteMap_Url",description = "")
+    @Test(priority = 1,dataProvider = "siteMap_Url",description = "sdsdsdssd")
     public void brokenLink(String input) throws GeneralSecurityException, IOException {
         DriverActions.openURL(input);
         DriverActions.waitForTitleContains(("XML Sitemap"));
@@ -31,13 +31,13 @@ public class HomePageTest extends BaseTest {
         DriverActions.waitForTitleContains(("XML Sitemap"));
         verifyImageAltAttributes();
     }
-
-   // @Test(priority = 5,description = "")
-    public void imageAltTagChecker() throws GeneralSecurityException, IOException {
-        verifyImageAltAttributes();
+    @Test(priority = 4,dataProvider = "siteMap_Url",description = "")
+    public void verifyMetaData(String URL) throws IOException, GeneralSecurityException {
+        DriverActions.openURL(URL);
+        metaDataCheck();
     }
 
-    @DataProvider
+    @DataProvider(parallel = true)
     public Object[][] siteMap_Url(){
         return new Object[][] {{"https://www.novalnet.com/post-sitemap.xml"},
                 {"https://www.novalnet.com/page-sitemap.xml"},

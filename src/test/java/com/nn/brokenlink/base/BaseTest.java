@@ -1,4 +1,4 @@
-package com.nn.pages.brokenlink.base;
+package com.nn.brokenlink.base;
 
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -166,6 +166,7 @@ public class BaseTest {
             driver.manage().window().maximize();
         return driver;
     }
+
 
     private static WebDriver firefoxDriver() {
         WebDriver driver;

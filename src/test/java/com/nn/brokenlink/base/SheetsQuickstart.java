@@ -31,7 +31,7 @@ public class SheetsQuickstart {
    * If modifying these scopes, delete your previously saved tokens/ folder.
    */
   private static final List<String> SCOPES =
-      Collections.singletonList(SheetsScopes.SPREADSHEETS);
+          Collections.singletonList(SheetsScopes.SPREADSHEETS);
   private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
   /**
@@ -42,21 +42,21 @@ public class SheetsQuickstart {
    * @throws IOException If the credentials.json file cannot be found.
    */
   private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
-      throws IOException {
+          throws IOException {
     // Load client secrets.
     InputStream in = SheetsQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
     if (in == null) {
       throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
     }
     GoogleClientSecrets clientSecrets =
-        GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+            GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
     // Build flow and trigger user authorization request.
     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-        HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-        .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-        .setAccessType("offline")
-        .build();
+            HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
+            .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+            .setAccessType("offline")
+            .build();
     LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
     return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
   }
@@ -71,12 +71,12 @@ public class SheetsQuickstart {
     final String spreadsheetId = "1wrkelAEm4KGDMHais-d_xHaoKssYIH9KpKq_Xe76Ouc";
     final String range = "Class Data!A2:E";
     Sheets service =
-        new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-            .setApplicationName(APPLICATION_NAME)
-            .build();
+            new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
     ValueRange response = service.spreadsheets().values()
-        .get(spreadsheetId, range)
-        .execute();
+            .get(spreadsheetId, range)
+            .execute();
     List<List<Object>> values = response.getValues();
     if (values == null || values.isEmpty()) {
       System.out.println("No data found.");
