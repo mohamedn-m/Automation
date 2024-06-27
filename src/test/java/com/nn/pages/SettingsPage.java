@@ -45,7 +45,7 @@ public class SettingsPage {
 	private By novalnetSubscriptionPaymentsDropdown = By.cssSelector("#novalnet_subs_payments");
 	private By novalnetSubscriptionTariffDropdown = By.cssSelector("#novalnet_subs_tariff_id");
 	private By novalnetAllowManualTestCallbackCheckbox = By.cssSelector("#novalnet_callback_test_mode");
-	private By saveChangesBtn = By.cssSelector(".button-primary.woocommerce-save-button");
+	private By saveChangesBtn = By.xpath("//*[@name='save']");
 	private By mainFrame = By.cssSelector("#mainform");
 
 	//Subscription
