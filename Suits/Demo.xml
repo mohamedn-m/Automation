@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name ="Shopware Novalnet Credit Card Payment Tests"  verbose="1"  >
+<suite name ="Homepage Tests" verbose="1" parallel="tests" preserve-order="true" data-provider-thread-count="4">
 
 	<listeners>
 		<listener class-name="com.nn.listeners.TestListeners" />
@@ -9,15 +9,14 @@
 
 	<test name = "CreditCard">
 		<classes>
-			<class name = "com.nn.testcase.shopware.compatibility.CreditCard">
+			<class name = "com.nn.testcase.homepage.HomePageTest">
 				<methods>
-					<include name="capture_Order"/>
+					<include name="brokenLink"/>
 				</methods>
 
 			</class>
 		</classes>
 	</test>
-
 
 
 </suite>

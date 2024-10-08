@@ -1,17 +1,5 @@
 package com.nn.brokenlink.base;
 
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.*;
 import com.nn.drivers.DriverManager;
 import com.nn.reports.ExtentTestManager;
 import com.nn.testcase.SheetsQuickstart;
@@ -23,6 +11,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -72,9 +62,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import static com.nn.constants.Constants.HEADLESS;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -110,7 +103,9 @@ public class BaseTest {
             Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
+    private static final Lock lock = new ReentrantLock();
 
+    private static File xl = new File(System.getProperty("user.dir") + "/src/test/resources/HomePage.xlsx");
     @BeforeTest(alwaysRun = true)
     @Parameters({"BROWSER"})
     public void createDriver(@Optional("chrome") String browser) {
@@ -208,7 +203,6 @@ public class BaseTest {
     }
 
     public void checkSublinks() throws IOException, GeneralSecurityException {
-        getSpreadsheetInstance();
         List<String> novalnetLinks = getAllNovalnetLinks();
 
         for (String url : novalnetLinks) {
@@ -251,7 +245,6 @@ public class BaseTest {
                 break;
         }
         if(result!=true){
-            getSpreadsheetInstance();
             int statusCode = 0;
             String statusMessage = null;
             int currentCount = count.incrementAndGet();
@@ -272,20 +265,20 @@ public class BaseTest {
                 if (statusCode == 200) {
                     System.out.println(currentCount + ": " + url + ": " + "Link is valid(HTTP response code: " + statusCode + ")");
                     if(checked200UrlS.add(url)){
-                        writeDataGoogleSheets("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl)), existingSpreadSheetID);
+                        writeDataToSheet("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl)), xl);
                     }
 
                 } else {
-                    writeDataGoogleSheets("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl)), existingSpreadSheetID);
+                    writeDataToSheet("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl)), xl);
                     System.err.println(currentCount + ": " + url + ": " + "Link is broken (HTTP response code: "
                             + statusCode + ")");
                 }
             } catch (Exception e) {
                 if (statusCode == 0) {
-                    writeDataGoogleSheets("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, "null", sourceUrl)), existingSpreadSheetID);
+                    writeDataToSheet("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, "null", sourceUrl)), xl);
                     System.err.println(currentCount + ": " + url + ": " + "Exception occurred: " + statusMessage);
                 } else {
-                    writeDataGoogleSheets("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl)), existingSpreadSheetID);
+                    writeDataToSheet("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl)), xl);
                     System.err.println(currentCount + ": " + url + ": " + "Exception occurred: " + statusMessage);
                 }
             }
@@ -294,129 +287,8 @@ public class BaseTest {
         }
 
 
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
-            throws IOException {
-        // Load client secrets.
-        InputStream in = SheetsQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-        }
-        GoogleClientSecrets clientSecrets =
-                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-        // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-                .setAccessType("offline")
-                .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-    }
-
-    public void addDataInGooGleSheet(String URL, int statusCode, String statusMessage, String soureURL) throws IOException, GeneralSecurityException {
-        // Build a new authorized API client service.
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        final String spreadsheetId = "1wrkelAEm4KGDMHais-d_xHaoKssYIH9KpKq_Xe76Ouc";
-        final String range = "Class Data!A2:E";
-
-        Sheets service =
-                new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                        .setApplicationName(APPLICATION_NAME)
-                        .build();
-        ValueRange response = service.spreadsheets().values()
-                .get(spreadsheetId, range)
-                .execute();
-
-        getSpreadsheetInstance();
-        //  createNewSpreadSheet();
-         createNewSheet(existingSpreadSheetID, "BROKENLINKS");
-        writeDataGoogleSheets("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(URL, statusCode, statusMessage, soureURL)), existingSpreadSheetID);
-    }
-
-    public static void createNewSheet(String existingSpreadSheetID, String newsheetTitle) throws GeneralSecurityException, IOException {
-
-        //Create a new AddSheetRequest
-        AddSheetRequest addShettRequest = new AddSheetRequest();
-        SheetProperties sheetProperties = new SheetProperties();
-        sheetProperties.setIndex(0);
-
-        //add the sheetName to the sheetProperties
-        addShettRequest.setProperties(sheetProperties);
-        addShettRequest.setProperties(sheetProperties.setTitle(newsheetTitle));
-
-        //create btachUpdateSpreadsheetRequest
-        BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest();
-
-        //create requestList and set it on the batchUpdateSpreadsheetRequest
-        List<Request> requestsList = new ArrayList<Request>();
-        batchUpdateSpreadsheetRequest.setRequests(requestsList);
-
-        //create a new request with containing the addSheetRequest and add it to the requestList
-        Request request = new Request();
-        request.setAddSheet(addShettRequest);
-        requestsList.add(request);
-
-        //add the requestList to the batchUpdateSpreadSheetRequest
-        batchUpdateSpreadsheetRequest.setRequests(requestsList);
-
-        //call the sheets API to execute the batchUpdate
-        spreadsheets.batchUpdate(existingSpreadSheetID, batchUpdateSpreadsheetRequest).execute();
-
-    }
-
-    public static void getSpreadsheetInstance() throws GeneralSecurityException, IOException {
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        spreadsheets = new Sheets.Builder(GoogleNetHttpTransport.newTrustedTransport(),
-                GsonFactory.getDefaultInstance(), getCredentials(HTTP_TRANSPORT))
-                .setApplicationName("Google Sheet Java Integrate").build().spreadsheets();
-    }
-
-    public static void writeDataGoogleSheets(String sheetName, List<Object> data, String existingSpreadSheetId) throws IOException {
-        int nextROW = getRows(sheetName, existingSpreadSheetId) + 1;
-        writeSheet(data, "!A" + nextROW, existingSpreadSheetId);
-
-    }
-
-    public static int getRows(String sheetName, String existingSpreadSheetID) throws IOException {
-        List<List<Object>> values = spreadsheets.values().get(existingSpreadSheetID, sheetName)
-                .execute().getValues();
-        int numRows = values != null ? values.size() : 0;
-        System.out.printf("%d rows retrived. in " + sheetName + "\n", numRows);
-        return numRows;
-    }
-
-    public void addDataInGooGleSheet() throws IOException, GeneralSecurityException {
-        // Build a new authorized API client service.
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        final String spreadsheetId = "1wrkelAEm4KGDMHais-d_xHaoKssYIH9KpKq_Xe76Ouc";
-        final String range = "Class Data!A2:E";
-
-        Sheets service =
-                new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                        .setApplicationName(APPLICATION_NAME)
-                        .build();
-        ValueRange response = service.spreadsheets().values()
-                .get(spreadsheetId, range)
-                .execute();
-
-        getSpreadsheetInstance();
-        // createNewSpreadSheet();
-         // createNewSheet(existingSpreadSheetID, "BROKENLINKS_DE");
-        writeDataGoogleSheets("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList("")), existingSpreadSheetID);
-    }
-
-    public static void writeSheet(List<Object> inputData, String sheetAndRange, String existingSpreadSheetID) throws IOException {
-        //USER_ENTERED
-        List<List<Object>> values = Arrays.asList(inputData);
-        ValueRange body = new ValueRange().setValues(values);
-        UpdateValuesResponse result = spreadsheets.values().update(existingSpreadSheetID, sheetAndRange, body)
-                .setValueInputOption("RAW").execute();
-        System.out.printf("%d cells updated.\n", result.getUpdatedCells());
-    }
-
     public void metaDataCheck() throws IOException, GeneralSecurityException {
-        getSpreadsheetInstance();
+      //  getSpreadsheetInstance();
         List<String> urls = getAllNovalnetLinks();
         for(String url:urls) {
             DriverActions.openURL(url);
@@ -427,7 +299,7 @@ public class BaseTest {
                 if (value.equals("Description")) {
                     WebElement descriptionMetaTag = DriverActions.getElement(By.xpath("//meta[@name='Description']"));
                     String description = descriptionMetaTag.getAttribute("content");
-                    writeDataGoogleSheets("META_DESCRIPTIION_DE", new ArrayList<Object>(Arrays.asList(url, "YES", description, description.length(), value)), existingSpreadSheetID);
+                 //   writeDataGoogleSheets("META_DESCRIPTIION_DE", new ArrayList<Object>(Arrays.asList(url, "YES", description, description.length(), value)), existingSpreadSheetID);
                     break;
                 }
             }
@@ -439,7 +311,7 @@ public class BaseTest {
         }
 
     public void verifyH1Tags() throws IOException, GeneralSecurityException {
-        getSpreadsheetInstance();
+       // getSpreadsheetInstance();
         List<String> novalnetLinks = getAllNovalnetLinks();
         List<List<Object>> dataToWrite = new ArrayList<>();
 
@@ -452,13 +324,13 @@ public class BaseTest {
             }
         }
 
-        writeDataGoogleSheetsBatch("BROKENLINKS_DE", dataToWrite, existingSpreadSheetID);
+      //  writeDataGoogleSheetsBatch("BROKENLINKS_DE", dataToWrite, existingSpreadSheetID);
 
     }
 
     public void verifyImageAltAttributes() throws GeneralSecurityException, IOException {
         String altValue=null;
-        getSpreadsheetInstance();
+      //  getSpreadsheetInstance();
         List<String> novalnetLinks = getAllNovalnetLinks();
         List<List<Object>> dataToWrite = new ArrayList<>();
 
@@ -499,7 +371,7 @@ public class BaseTest {
                 }
             }
         }
-        writeDataGoogleSheetsBatch("BROKENLINKS_DE", dataToWrite, existingSpreadSheetID);
+        //writeDataGoogleSheetsBatch("BROKENLINKS_DE", dataToWrite, existingSpreadSheetID);
     }
 
     /*public void verifyImageAltAttributes() throws GeneralSecurityException, IOException {
@@ -535,27 +407,78 @@ public class BaseTest {
         }*/
 
 
-    public static void writeDataGoogleSheetsBatch(String sheetName, List<List<Object>> data, String existingSpreadSheetID) throws IOException {
-        List<ValueRange> dataRange = new ArrayList<>();
-        int nextROW = getRows(sheetName, existingSpreadSheetID) + 1;
 
-        for (List<Object> row : data) {
-            ValueRange valueRange = new ValueRange();
-            valueRange.setRange(sheetName + "!A" + nextROW);
-            valueRange.setValues(Collections.singletonList(row));
-            dataRange.add(valueRange);
-            nextROW++;  // Move to the next row
+
+    public void writeDataToSheet(String sheetName, List<Object> data, File filePath) throws IOException {
+        lock.lock();  // Lock the block to prevent concurrent writes
+        try {
+            // Load the existing workbook
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            Workbook workbook = new XSSFWorkbook(fileInputStream);
+
+            // Get the sheet, or create it if it doesn't exist
+            org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheet(sheetName);
+            if (sheet == null) {
+                sheet = workbook.createSheet(sheetName);
+            }
+
+            // Get the next available row number
+            int nextRowNum = getNextRow(sheet);
+            Row row = sheet.createRow(nextRowNum);
+
+            // Write the data into the cells
+            int cellNum = 0;
+            for (Object value : data) {
+                Cell cell = row.createCell(cellNum++);
+                // Check the type of value before setting the cell value
+                if (value instanceof String) {
+                    cell.setCellValue((String) value);
+                } else if (value instanceof Integer) {
+                    cell.setCellValue((Integer) value);
+                } else if (value instanceof Double) {
+                    cell.setCellValue((Double) value);
+                } else {
+                    cell.setCellValue(value.toString());  // Default to string conversion
+                }
+            }
+
+            // Close the input stream
+            fileInputStream.close();
+
+            // Write the changes back to the file
+            FileOutputStream outputStream = new FileOutputStream(filePath);
+            workbook.write(outputStream);
+
+            // Close the workbook and output stream
+            workbook.close();
+            outputStream.close();
+        } finally {
+            lock.unlock();  // Ensure the lock is released even if an exception occurs
         }
-
-        BatchUpdateValuesRequest body = new BatchUpdateValuesRequest()
-                .setValueInputOption("RAW")
-                .setData(dataRange);
-
-        BatchUpdateValuesResponse response = spreadsheets.values().batchUpdate(existingSpreadSheetID, body).execute();
-        System.out.printf("%d cells updated.\n", response.getTotalUpdatedCells());
     }
 
+    // Helper method to get the next available row number
+    private int getNextRow(Sheet sheet) {
+        // Iterate over each row to find the first completely empty row
+        for (int rowNum = 0; rowNum <= sheet.getLastRowNum(); rowNum++) {
+            Row row = sheet.getRow(rowNum);
+            if (row == null || isRowEmpty(row)) {
+                return rowNum;
+            }
+        }
+        return sheet.getPhysicalNumberOfRows(); // If all rows are filled, return the next physical row number
+    }
 
+    // Helper method to check if a row is empty
+    private boolean isRowEmpty(Row row) {
+        for (int cellNum = 0; cellNum < row.getLastCellNum(); cellNum++) {
+            Cell cell = row.getCell(cellNum);
+            if (cell != null && cell.getCellType() != CellType.BLANK) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }
 
