@@ -311,7 +311,6 @@ public class BaseTest {
         }
 
     public void verifyH1Tags() throws IOException, GeneralSecurityException {
-       // getSpreadsheetInstance();
         List<String> novalnetLinks = getAllNovalnetLinks();
         List<List<Object>> dataToWrite = new ArrayList<>();
 
