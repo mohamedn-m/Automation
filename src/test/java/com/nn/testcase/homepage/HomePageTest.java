@@ -10,7 +10,7 @@ import java.security.GeneralSecurityException;
 
 public class HomePageTest extends BaseTest {
 
-    @Test(priority = 1,dataProvider = "siteMap_Url",description = "Check the status code for links  in homepage en and de ddfffd")
+    @Test(priority = 1,dataProvider = "siteMap_Url",description = "Check the status code for links  in homepage en and de vignesh")
     public void brokenLink(String input) throws GeneralSecurityException, IOException {
         DriverActions.openURL(input);
         DriverActions.waitForTitleContains(("XML Sitemap"));
@@ -19,7 +19,7 @@ public class HomePageTest extends BaseTest {
     }
 
 
-    @Test(priority = 2,dataProvider = "siteMap_Url",description = "verify the more than one H1 tag in the URL vignesh")
+    @Test(priority = 2,dataProvider = "siteMap_Url",description = "verify the more than one H1 tag in the URL ")
     public void H1TagChecker(String input) throws IOException, GeneralSecurityException {
         DriverActions.openURL(input);
         DriverActions.waitForTitleContains(("XML Sitemap"));
