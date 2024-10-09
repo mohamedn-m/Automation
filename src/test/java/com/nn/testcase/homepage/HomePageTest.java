@@ -32,7 +32,7 @@ public class HomePageTest extends BaseTest {
         DriverActions.waitForTitleContains(("XML Sitemap"));
         verifyImageAltAttributes();
     }
-    @Test(priority = 4,dataProvider = "siteMap_Url",description = "test1")
+    @Test(priority = 4,dataProvider = "siteMap_Url",description = "verify meta")
     public void verifyMetaData(String URL) throws IOException, GeneralSecurityException {
         DriverActions.openURL(URL);
         metaDataCheck();

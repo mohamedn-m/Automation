@@ -312,18 +312,16 @@ public class BaseTest {
 
     public void verifyH1Tags() throws IOException, GeneralSecurityException {
         List<String> novalnetLinks = getAllNovalnetLinks();
-        List<List<Object>> dataToWrite = new ArrayList<>();
-
         for (String url : novalnetLinks) {
             DriverActions.openURL(url);
             if (url != null && !url.isEmpty() && url.contains("novalnet") && checkedURLs.add(url)) {
                DriverActions.waitForPageLoad();
                List<WebElement> h1Tags = DriverActions.getElements(By.xpath("//h1"));
-                     dataToWrite.add(Arrays.asList(url, h1Tags.size()));
+                writeDataToSheet("H1TAGS", new ArrayList<Object>(Arrays.asList(url,h1Tags.size())), xl);
             }
         }
 
-      //  writeDataGoogleSheetsBatch("BROKENLINKS_DE", dataToWrite, existingSpreadSheetID);
+
 
     }
 
