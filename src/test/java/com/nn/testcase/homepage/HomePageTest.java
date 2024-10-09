@@ -10,7 +10,7 @@ import java.security.GeneralSecurityException;
 
 public class HomePageTest extends BaseTest {
 
-    @Test(priority = 1,dataProvider = "siteMap_Url",description = "sdsdsdssd")
+    @Test(priority = 1,dataProvider = "siteMap_Url",description = "Check the status code for links  in homepage en and de ddfffd")
     public void brokenLink(String input) throws GeneralSecurityException, IOException {
         DriverActions.openURL(input);
         DriverActions.waitForTitleContains(("XML Sitemap"));
@@ -32,7 +32,9 @@ public class HomePageTest extends BaseTest {
         DriverActions.waitForTitleContains(("XML Sitemap"));
         verifyImageAltAttributes();
     }
+
     @Test(priority = 4,dataProvider = "siteMap_Url",description = "verify meta")
+
     public void verifyMetaData(String URL) throws IOException, GeneralSecurityException {
         DriverActions.openURL(URL);
         metaDataCheck();
