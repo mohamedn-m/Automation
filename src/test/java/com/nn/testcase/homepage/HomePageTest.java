@@ -10,7 +10,7 @@ import java.security.GeneralSecurityException;
 
 public class HomePageTest extends BaseTest {
 
-    @Test(priority = 1,dataProvider = "siteMap_Url",description = "Check the status code for links")
+    @Test(priority = 1,dataProvider = "siteMap_Url",description = "")
     public void brokenLink(String input) throws GeneralSecurityException, IOException {
         DriverActions.openURL(input);
         DriverActions.waitForTitleContains(("XML Sitemap"));
