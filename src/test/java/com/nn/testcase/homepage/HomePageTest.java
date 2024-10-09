@@ -19,7 +19,7 @@ public class HomePageTest extends BaseTest {
     }
 
 
-    @Test(priority = 2,dataProvider = "siteMap_Url",description = "verify the more than one H1 tag in the URL")
+    @Test(priority = 2,dataProvider = "siteMap_Url",description = "verify the more than one H1 tag in the URL vignesh")
     public void H1TagChecker(String input) throws IOException, GeneralSecurityException {
         DriverActions.openURL(input);
         DriverActions.waitForTitleContains(("XML Sitemap"));
