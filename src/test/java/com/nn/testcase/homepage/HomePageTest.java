@@ -33,7 +33,7 @@ public class HomePageTest extends BaseTest {
         verifyImageAltAttributes();
     }
 
-    @Test(priority = 4,dataProvider = "siteMap_Url",description = "verify meta")
+    @Test(priority = 4,dataProvider = "siteMap_Url",description = "verify meta data description")
 
     public void verifyMetaData(String URL) throws IOException, GeneralSecurityException {
         DriverActions.openURL(URL);
