@@ -10,7 +10,7 @@ import java.security.GeneralSecurityException;
 
 public class HomePageTest extends BaseTest {
 
-    @Test(priority = 1,dataProvider = "siteMap_Url",description = "Check the status code for links  in homepage en and de ddfffd")
+    @Test(priority = 1,dataProvider = "siteMap_Url",description = "Check the status code for links  in homepage en and de vignesh")
     public void brokenLink(String input) throws GeneralSecurityException, IOException {
         DriverActions.openURL(input);
         DriverActions.waitForTitleContains(("XML Sitemap"));
@@ -19,7 +19,7 @@ public class HomePageTest extends BaseTest {
     }
 
 
-    @Test(priority = 2,dataProvider = "siteMap_Url",description = "verify the more than one H1 tag in the URL vignesh")
+    @Test(priority = 2,dataProvider = "siteMap_Url",description = "verify the more than one H1 tag in the URL ")
     public void H1TagChecker(String input) throws IOException, GeneralSecurityException {
         DriverActions.openURL(input);
         DriverActions.waitForTitleContains(("XML Sitemap"));
@@ -38,7 +38,7 @@ public class HomePageTest extends BaseTest {
         metaDataCheck();
     }
 
-    @DataProvider()
+/*    @DataProvider()
     public Object[][] siteMap_Url(){
         return new Object[][] {{"https://www.novalnet.de/post-sitemap.xml"},
                 {"https://www.novalnet.de/page-sitemap.xml"},
@@ -51,6 +51,24 @@ public class HomePageTest extends BaseTest {
                 {"https://www.novalnet.de/category-sitemap.xml"},
                 {"https://www.novalnet.de/post_tag-sitemap.xml"},
                  {"https://www.novalnet.com/glossary_categories-sitemap.xml"}};
+    }*/
+
+    //www.novalnet.com site map urls
+    @DataProvider()
+    public Object[][] siteMap_Url(){
+        return new Object[][] {//{"https://www.novalnet.com/post-sitemap.xml"},
+                /* {"https://www.novalnet.com/page-sitemap.xml"},
+                  {"https://www.novalnet.com/integration-sitemap.xml"},
+                 {"https://www.novalnet.com/news-sitemap.xml"},*/
+                {"https://www.novalnet.com/paymentsolution-sitemap.xml"},
+                /*{"https://www.novalnet.com/glossary-sitemap.xml"},
+                   {"https://www.novalnet.com/news_categories-sitemap.xml"},
+                   {"https://www.novalnet.com/glossary_categories-sitemap.xml"},
+                    {"https://www.novalnet.com/careers-sitemap.xml"}*/
+        };
     }
+
+
+
 
 }

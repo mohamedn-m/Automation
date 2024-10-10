@@ -39,9 +39,9 @@ public final class Constants {
 
   //  public static final String NOVALNET_API_KEY =  "n7ibc7ob5t|doU3HJVoym7MQ44qonbobljblnmdli0p|qJEH3gNbeWJfIHah||f7cpn7pc";
 
-    public static final String NOVALNET_API_KEY =System.getProperty("NOVALNET_API_KEY").replaceAll("\\\\", "")
+    /*public static final String NOVALNET_API_KEY =System.getProperty("NOVALNET_API_KEY").replaceAll("\\\\", "")
             .replaceAll("^\\|+|\\|+$", "").replaceAll("(?<=\\|)\\|\\|(?=\\|)", "| |");
-    //public static final String NOVALNET_API_KEY = "7ibc7ob5|xtJEH3gNbeWJfIHah||nbobljbnmdli0poyw|doU3HJVoym7MQ44qf7cpn7pc";
+    //public static final String NOVALNET_API_KEY = "7ibc7ob5|xtJEH3gNbeWJfIHah||nbobljbnmdli0poyw|doU3HJVoym7MQ44qf7cpn7pc";*/
     public static final String NOVALNET_ACCESSKEY =  System.getProperty("NOVALNET_ACCESSKEY");
     //public static final String NOVALNET_ACCESSKEY =  "a87ff679a2f3e71d9181a67b7542122c";
     public static final String NOVALNET_TARIFF = System.getProperty("NOVALNET_TARIFF");

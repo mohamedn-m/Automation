@@ -88,7 +88,7 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
-public class BaseTest {
+public class BaseTest extends SkipUrls {
 
     private Set<String> checked200UrlS = new HashSet<>();
     private Set<String> checkedURLs = new HashSet<>();
@@ -104,6 +104,11 @@ public class BaseTest {
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     private static final Lock lock = new ReentrantLock();
+    public String linkchecksheetname ="BROKENLINK";
+    public String imagechecksheetname ="BROKENIMAGE";
+    public String metachecksheetname ="META-CHECK";
+    public String H1tagchecksheetname ="H1TAG-CHECK";
+    public String imagealtchecksheetname ="IMAGEALT-CHECK";
 
     private static File xl = new File(System.getProperty("user.dir") + "/src/test/resources/HomePage.xlsx");
     @BeforeTest(alwaysRun = true)
@@ -196,7 +201,7 @@ public class BaseTest {
         for (WebElement link : allLinks) {
             String href = link.getAttribute("href");
             if (href != null && !href.isEmpty() && href.contains("novalnet")) {
-                verifyLink( "N/A", href);
+                verifyLink( "N/A", href,linkchecksheetname ,"Broken_Link");
             }
         }
 
@@ -209,15 +214,25 @@ public class BaseTest {
             DriverActions.openURL(url);
             DriverActions.waitForAllElementLocated(By.tagName("a"));
             List<WebElement> innerLinks = DriverActions.getElements(By.tagName("a"));
+            DriverActions.waitForAllElementLocated(By.tagName("img"));
+            List<WebElement> imgTags = DriverActions.getElements(By.tagName("img"));
             for (WebElement innerLink : innerLinks) {
                 String subUrl = innerLink.getAttribute("href");
                 if (subUrl != null && !subUrl.isEmpty()
                         && (subUrl.startsWith("https://") || subUrl.startsWith("http://"))) {
-                    verifyLink(url, subUrl);
+                    verifyLink(url, subUrl, linkchecksheetname,"Broken_Link");
+                }
+
+            }
+            for (WebElement value : imgTags) {
+                String imageurl = value.getAttribute("src");
+                if (imageurl != null && (imageurl.contains("https") || imageurl.contains("http"))) {
+                    verifyLink(url, imageurl, imagechecksheetname,"Broken_Image");
+
                 }
             }
-        }
 
+        }
     }
 
 
@@ -237,7 +252,8 @@ public class BaseTest {
         return novalnetLinks;
     }
 
-    private void verifyLink(String sourceUrl, String url) throws IOException, GeneralSecurityException {
+    private void verifyLink(String sourceUrl, String url ,String sheetname ,String purpose) throws IOException, GeneralSecurityException {
+
         boolean result =false;
         for(String successURs :checked200UrlS){
             result = successURs.equals(url);
@@ -265,20 +281,20 @@ public class BaseTest {
                 if (statusCode == 200) {
                     System.out.println(currentCount + ": " + url + ": " + "Link is valid(HTTP response code: " + statusCode + ")");
                     if(checked200UrlS.add(url)){
-                        writeDataToSheet("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl)), xl);
+                        writeDataToSheet(sheetname, new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl,purpose)), xl);
                     }
 
                 } else {
-                    writeDataToSheet("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl)), xl);
+                    writeDataToSheet(sheetname, new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl,purpose)), xl);
                     System.err.println(currentCount + ": " + url + ": " + "Link is broken (HTTP response code: "
                             + statusCode + ")");
                 }
             } catch (Exception e) {
                 if (statusCode == 0) {
-                    writeDataToSheet("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, "null", sourceUrl)), xl);
+                    writeDataToSheet(sheetname, new ArrayList<Object>(Arrays.asList(url, statusCode, "null", sourceUrl,purpose)), xl);
                     System.err.println(currentCount + ": " + url + ": " + "Exception occurred: " + statusMessage);
                 } else {
-                    writeDataToSheet("BROKENLINKS_DE", new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl)), xl);
+                    writeDataToSheet(sheetname, new ArrayList<Object>(Arrays.asList(url, statusCode, statusMessage, sourceUrl,purpose)), xl);
                     System.err.println(currentCount + ": " + url + ": " + "Exception occurred: " + statusMessage);
                 }
             }
@@ -288,27 +304,29 @@ public class BaseTest {
 
 
     public void metaDataCheck() throws IOException, GeneralSecurityException {
-      //  getSpreadsheetInstance();
         List<String> urls = getAllNovalnetLinks();
         for(String url:urls) {
             DriverActions.openURL(url);
             String value = null;
             List<WebElement> metaTags = DriverActions.getElements(By.tagName("meta"));
+            WebElement lastIndexTag =metaTags.get(metaTags.size() - 1);
+            String lastIndexTagValue=lastIndexTag.getAttribute("name").replaceAll("\\s", "");
             for (WebElement metTag : metaTags) {
                 value = metTag.getAttribute("name").replaceAll("\\s", "");
-                if (value.equals("Description")) {
-                    WebElement descriptionMetaTag = DriverActions.getElement(By.xpath("//meta[@name='Description']"));
+                if (value.equalsIgnoreCase("description")) {
+                    String xpath = value.equals("description") ? "//meta[@name='description']" : "//meta[@name='Description']";
+                    WebElement descriptionMetaTag = DriverActions.getElement(By.xpath(xpath));
                     String description = descriptionMetaTag.getAttribute("content");
-                 //   writeDataGoogleSheets("META_DESCRIPTIION_DE", new ArrayList<Object>(Arrays.asList(url, "YES", description, description.length(), value)), existingSpreadSheetID);
+                    String lengthCondition = (description.length()<=155) ? "Yes" : "No";
+                    writeDataToSheet(metachecksheetname, new ArrayList<Object>(Arrays.asList(url, "YES", description, value, description.length(), lengthCondition)), xl);
                     break;
+
+                } else if (value.equals(lastIndexTagValue)) {
+                    writeDataToSheet(metachecksheetname, new ArrayList<Object>(Arrays.asList(url, "NO", "N/A", "N/A", "N/A")), xl);
                 }
             }
-
-
-
         }
-
-        }
+    }
 
     public void verifyH1Tags() throws IOException, GeneralSecurityException {
         List<String> novalnetLinks = getAllNovalnetLinks();
@@ -319,11 +337,10 @@ public class BaseTest {
             if (url != null && !url.isEmpty() && url.contains("novalnet") && checkedURLs.add(url)) {
                DriverActions.waitForPageLoad();
                List<WebElement> h1Tags = DriverActions.getElements(By.xpath("//h1"));
-                     dataToWrite.add(Arrays.asList(url, h1Tags.size()));
+                String lengthCondition = (h1Tags.size()<=1) ? "Yes" : "No";
+                writeDataToSheet(H1tagchecksheetname, new ArrayList<Object>(Arrays.asList(url, h1Tags.size(), lengthCondition)), xl);
             }
         }
-
-      //  writeDataGoogleSheetsBatch("BROKENLINKS_DE", dataToWrite, existingSpreadSheetID);
 
     }
 
@@ -332,23 +349,6 @@ public class BaseTest {
       //  getSpreadsheetInstance();
         List<String> novalnetLinks = getAllNovalnetLinks();
         List<List<Object>> dataToWrite = new ArrayList<>();
-
-        Set<String> urlsToSkip = new HashSet<>(Arrays.asList(
-                "https://www.novalnet.com/wp-content/uploads/2024/03/kreditkarte-pcidss.webp",
-                "https://www.novalnet.com/wp-content/uploads/2024/03/Add-a-heading-1.svg",
-                "https://www.novalnet.com/wp-content/uploads/2024/03/software_hosted-1.webp",
-                "https://www.novalnet.com/wp-content/uploads/2022/08/alliance-for-cyber-security.svg",
-                "https://www.novalnet.com/wp-content/uploads/2024/06/cross-border-payments-150x150.jpg",
-                "https://www.novalnet.com/wp-content/uploads/2024/06/influencer-marketing-150x150.jpg",
-                "https://www.novalnet.com/wp-content/uploads/2024/06/ai-fraud-prevention-150x150.jpg",
-                "https://www.novalnet.com/wp-content/themes/wp-bootstrap-starter/images/linkedin.svg",
-                "https://www.novalnet.com/wp-content/themes/wp-bootstrap-starter/images/twitter_icon.png",
-                "https://www.novalnet.com/wp-content/themes/wp-bootstrap-starter/images/fb_icon.png",
-                "https://www.novalnet.com/wp-content/themes/wp-bootstrap-starter/images/instagram-icon.svg",
-                "https://www.novalnet.com/wp-content/themes/wp-bootstrap-starter/images/payment-plugin-form.webp",
-                "https://www.novalnet.com/wp-content/themes/wp-bootstrap-starter/images/form-bg.webp",
-                "https://www.novalnet.com/wp-content/themes/wp-bootstrap-starter/images/x_icon.png"
-        ));
         for(String novalnetURL:novalnetLinks) {
             DriverActions.openURL(novalnetURL);
             if (checkedURLs.add(novalnetURL)) {
@@ -365,12 +365,11 @@ public class BaseTest {
                          altValue="NIL";
                      }
 
+                    writeDataToSheet(imagealtchecksheetname, new ArrayList<Object>(Arrays.asList(novalnetURL, "YES", imageURL, altValue)), xl);
 
-                    dataToWrite.add(Arrays.asList(novalnetURL, imageURL, altValue));
                 }
             }
         }
-        //writeDataGoogleSheetsBatch("BROKENLINKS_DE", dataToWrite, existingSpreadSheetID);
     }
 
     /*public void verifyImageAltAttributes() throws GeneralSecurityException, IOException {
