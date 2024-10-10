@@ -10,7 +10,7 @@
 		<classes>
 			<class name = "com.nn.testcase.homepage.HomePageTest">
 				<methods>
-					<include name="brokenLink"/>
+					<include name="verifyMetaData"/>
 				</methods>
 
 			</class>
