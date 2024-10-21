@@ -10,10 +10,13 @@
 		<classes>
 			<class name = "com.nn.testcase.homepage.HomePageTest">
 				<methods>
-					<include name="verifyMetaData"/>
+					<include name="Canonicalckeck"/>
 				</methods>
 
 			</class>
+
+
+
 		</classes>
 	</test>
 	<!--<test name = "brokenlinkss">
