@@ -3,9 +3,9 @@
 
 <suite name ="Homepage Tests" verbose="1" parallel="tests" preserve-order="true" data-provider-thread-count="4">
 
-	<listeners>
+	<!--<listeners>
 		<listener class-name="com.nn.listeners.TestListeners" />
-	</listeners>
+	</listeners>-->
 
 	<test name = "CreditCard">
 		<classes>

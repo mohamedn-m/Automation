@@ -510,7 +510,7 @@ public class DriverActions {
 		driver().get(url);
 		int currentCount = count.incrementAndGet();
 		Log.info(currentCount +" : "+ "Open URL : "+url);
-		ExtentTestManager.logMessage(Status.PASS, "Open URL : "+url);
+		//ExtentTestManager.logMessage(Status.PASS, "Open URL : "+url);
 		////waitForPageLoad();
     }
     
