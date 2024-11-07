@@ -26,11 +26,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
-      # Install matching ChromeDriver
+      # Install compatible ChromeDriver
       - name: Install ChromeDriver
         run: |
           CHROME_VERSION=$(google-chrome --version | grep -oE '[0-9]+(\.[0-9]+)+')
+          echo "Installed Google Chrome version: $CHROME_VERSION"
+          
+          # Fetch a compatible ChromeDriver version or use the latest available
           DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION" || curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+          
+          if [[ "$DRIVER_VERSION" == *"Error"* ]] || [ -z "$DRIVER_VERSION" ]; then
+            echo "Failed to retrieve a compatible ChromeDriver version, defaulting to the latest version."
+            DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+          fi
+
+          echo "Using ChromeDriver version: $DRIVER_VERSION"
           wget "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
           unzip -o chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
