@@ -61,19 +61,10 @@ public class BaseTest extends SkipUrls {
 
     private static File xl = new File(System.getProperty("user.dir") + "/src/test/resources/HomePage.xlsx");
 
-    public static void quitRefresh(){
-        System.out.println("Driver_Going_to_Refres");
-        DriverManager.getDriver().quit();
-        WebDriver driver = setupBrowser();
-        DriverManager.setDriver(driver);
-        driver.manage().deleteAllCookies();
-        System.out.println("Driver_Refreshed");
-
-    }
     @BeforeTest(alwaysRun = true)
     @Parameters({"BROWSER"})
     public void createDriver() {
-        WebDriver driver = setupBrowser();
+        WebDriver driver =  new ChromeDriver();
         DriverManager.setDriver(driver);
     }
 
@@ -85,51 +76,6 @@ public class BaseTest extends SkipUrls {
         }
 
     }
-
-
-    public static WebDriver setupBrowser() {
-        WebDriver driver;
-                driver = chromeDriver();
-        return driver;
-    }
-
-    private static WebDriver chromeDriver() {
-        WebDriver driver;
-        System.out.println("Launching Chrome Driver...");
-        ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless");     //options.addArguments("--headless=new");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        driver = new ChromeDriver(options);
-            driver.manage().window().maximize();
-        return driver;
-    }
-
-
-    private static WebDriver firefoxDriver() {
-        WebDriver driver;
-        System.setProperty("webdriver.http.factory", "jdk-http-client");
-        System.out.println("Launching FireFox Driver...");
-        FirefoxOptions options = new FirefoxOptions();
-        if (HEADLESS)
-            options.addArguments("--headless");
-        driver = new FirefoxDriver(options);
-        if (HEADLESS)
-            driver.manage().window().setSize(new Dimension(1920, 1080));
-        else
-            driver.manage().window().maximize();
-        return driver;
-    }
-
-    private static WebDriver edgeDriver() {
-        WebDriver driver;
-        System.out.println("Launching Edge Driver...");
-        EdgeOptions options = new EdgeOptions();
-        driver = new EdgeDriver(options);
-        driver.manage().window().maximize();
-        return driver;
-    }
-
 
     public void checkAllLinks() throws IOException, GeneralSecurityException {
         DriverManager.getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(60));
@@ -329,7 +275,7 @@ public class BaseTest extends SkipUrls {
                 writeDataToSheet(canonicalTagssheetname, Arrays.asList(novalneturl, "abnormal", valuecondition), xl);
             }
             if (currentCount > 0 && (currentCount % 100 == 0)) {
-                quitRefresh();
+               
             }
 
         }
