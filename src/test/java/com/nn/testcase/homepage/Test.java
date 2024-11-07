@@ -8,6 +8,7 @@ public class Test {
 
     @org.testng.annotations.Test
    public void test(){
+        ChromeOptions options = new ChromeOptions();
 System.out.println("Hello world");
         options.addArguments("--headless");  // Run Chrome in headless mode
         options.addArguments("--no-sandbox");  // Required in CI environments
