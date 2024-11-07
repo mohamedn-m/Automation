@@ -32,7 +32,7 @@ jobs:
           CHROME_VERSION=$(google-chrome --version | grep -oE '[0-9]+(\.[0-9]+)+')
           echo "Installed Google Chrome version: $CHROME_VERSION"
           
-          # Fetch a compatible ChromeDriver version or use the latest available
+          # Fetch the correct version of ChromeDriver
           DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION" || curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
           
           if [[ "$DRIVER_VERSION" == *"Error"* ]] || [ -z "$DRIVER_VERSION" ]; then
