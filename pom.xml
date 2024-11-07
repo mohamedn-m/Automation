@@ -299,15 +299,6 @@
                             <!--suppress UnresolvedMavenProperty -->
                             <HEADLESS>${HEADLESS}</HEADLESS>
                             <!--suppress UnresolvedMavenProperty -->
-                            <URL>${URL}</URL>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <USERNAME>admin</USERNAME>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <PASSWORD>wordpress</PASSWORD>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <CALLBACK_URL>${CALLBACK_URL}</CALLBACK_URL>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <URL_FRONTEND>${URL_FRONTEND}</URL_FRONTEND>
                             <!--suppress UnresolvedMavenProperty -->
                             <EXPLICIT_TIMEOUT>15</EXPLICIT_TIMEOUT>
                             <IMPLICIT_TIMEOUT>10</IMPLICIT_TIMEOUT>
@@ -318,14 +309,6 @@
                             <REPORT_TITLE>Report|AutomationFramework|Selenium|Novalnet</REPORT_TITLE>
                             <REPORT_EMAIL>nageshwaran_k@novalnetsolutions.com</REPORT_EMAIL>
                             <SENT_REPORT_TO_USER_IN_EMAIL>no</SENT_REPORT_TO_USER_IN_EMAIL>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <NOVALNET_API_KEY>${NOVALNET_API_KEY}</NOVALNET_API_KEY>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <NOVALNET_ACCESSKEY>${NOVALNET_ACCESSKEY}</NOVALNET_ACCESSKEY>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <NOVALNET_TARIFF>${NOVALNET_TARIFF}</NOVALNET_TARIFF>
-                            <!--suppress UnresolvedMavenProperty -->
-                            <NOVALNET_SUBSCRIPTION_TARIFF>${NOVALNET_SUBSCRIPTION_TARIFF}</NOVALNET_SUBSCRIPTION_TARIFF>
                         </systemPropertyVariables>
                     </configuration>
 
@@ -382,6 +365,16 @@
                                 <version>1.18.20</version>
                             </path>
                         </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M5</version>
+                    <configuration>
+                        <suiteXmlFiles>
+                            <suiteXmlFile>Suits/Demo.xml</suiteXmlFile>
+                        </suiteXmlFiles>
                     </configuration>
                 </plugin>
 
