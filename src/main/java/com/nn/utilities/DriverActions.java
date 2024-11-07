@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -45,7 +46,7 @@ import io.qameta.allure.Step;
 
 public class DriverActions {
 
-
+	private static AtomicInteger count = new AtomicInteger(0);
     //WebDriver instance
     private static WebDriver driver() {
 		return DriverManager.getDriver();
@@ -507,8 +508,8 @@ public class DriverActions {
     @Step("Open URL : {0}")
     public static void openURL(String url) {
 		driver().get(url);
-
-		Log.info("Open URL : "+url);
+		int currentCount = count.incrementAndGet();
+		Log.info(currentCount +" : "+ "Open URL : "+url);
 		ExtentTestManager.logMessage(Status.PASS, "Open URL : "+url);
 		////waitForPageLoad();
     }
@@ -1875,5 +1876,9 @@ public class DriverActions {
 			Assert.fail("Timeout waiting for the element Visible. " + by.toString());
 			return false;
 		}
+	}
+	public static WebElement waitForElementToBePresent(By by) {
+		WebDriverWait wait = new WebDriverWait(driver(), Duration.ofSeconds(60));
+		return wait.until(ExpectedConditions.presenceOfElementLocated(by));
 	}
 }

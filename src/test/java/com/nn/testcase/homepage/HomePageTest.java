@@ -33,12 +33,18 @@ public class HomePageTest extends BaseTest {
         verifyImageAltAttributes();
     }
     @Test(priority = 4,dataProvider = "siteMap_Url",description = "gffdgd")
-    public void verifyMetaData(String URL) throws IOException, GeneralSecurityException {
-        DriverActions.openURL(URL);
+    public void verifyMetaData(String input) throws IOException, GeneralSecurityException {
+        DriverActions.openURL(input);
         metaDataCheck();
     }
+    @Test(priority = 5,dataProvider = "siteMap_Url",description = "gffdgd")
+    public void Canonicalckeck(String input) throws IOException, GeneralSecurityException {
+        DriverActions.openURL(input);
+        DriverActions.waitForTitleContains(("XML Sitemap"));
+        canonicalTags();
+    }
 
-/*    @DataProvider()
+    @DataProvider()
     public Object[][] siteMap_Url(){
         return new Object[][] {{"https://www.novalnet.de/post-sitemap.xml"},
                 {"https://www.novalnet.de/page-sitemap.xml"},
@@ -51,22 +57,22 @@ public class HomePageTest extends BaseTest {
                 {"https://www.novalnet.de/category-sitemap.xml"},
                 {"https://www.novalnet.de/post_tag-sitemap.xml"},
                  {"https://www.novalnet.com/glossary_categories-sitemap.xml"}};
-    }*/
+    }
 
     //www.novalnet.com site map urls
-    @DataProvider()
+/*    @DataProvider()
     public Object[][] siteMap_Url(){
-        return new Object[][] {//{"https://www.novalnet.com/post-sitemap.xml"},
-                /* {"https://www.novalnet.com/page-sitemap.xml"},
+        return new Object[][] {{"https://www.novalnet.com/post-sitemap.xml"},
+                 {"https://www.novalnet.com/page-sitemap.xml"},
                   {"https://www.novalnet.com/integration-sitemap.xml"},
-                 {"https://www.novalnet.com/news-sitemap.xml"},*/
+                 {"https://www.novalnet.com/news-sitemap.xml"},
                 {"https://www.novalnet.com/paymentsolution-sitemap.xml"},
-                /*{"https://www.novalnet.com/glossary-sitemap.xml"},
+                {"https://www.novalnet.com/glossary-sitemap.xml"},
                    {"https://www.novalnet.com/news_categories-sitemap.xml"},
                    {"https://www.novalnet.com/glossary_categories-sitemap.xml"},
-                    {"https://www.novalnet.com/careers-sitemap.xml"}*/
+                    {"https://www.novalnet.com/careers-sitemap.xml"}
         };
-    }
+    }*/
 
 
 
