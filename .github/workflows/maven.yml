@@ -26,6 +26,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
+      - name: Verify Google Chrome version
+        run: google-chrome --version
+
       # Force remove all possible locations of chromedriver
       - name: Remove all previous chromedriver installations
         run: |
@@ -36,34 +39,29 @@ jobs:
           sudo find / -type f -name "chromedriver" -exec rm -f {} \;
           echo "Removed all chromedriver installations."
 
-      # Install compatible ChromeDriver
+      # Install ChromeDriver
       - name: Install ChromeDriver
         run: |
           CHROME_VERSION=$(google-chrome --version | grep -oE '[0-9]+(\.[0-9]+)+')
           echo "Installed Google Chrome version: $CHROME_VERSION"
           
-          # Fetch the matching ChromeDriver version using the exact Chrome version
           DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION" || curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
           
-          # Check if the DRIVER_VERSION is empty or returned an error, and use a fallback version
-          if [ -z "$DRIVER_VERSION" ] || [[ "$DRIVER_VERSION" == *"Error"* ]]; then
+          if [[ "$DRIVER_VERSION" == *"Error"* ]] || [ -z "$DRIVER_VERSION" ]; then
             echo "Failed to retrieve a compatible ChromeDriver version, defaulting to the latest version."
             DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
           fi
 
           echo "Using ChromeDriver version: $DRIVER_VERSION"
           
-          # Download and install the correct ChromeDriver version
           wget "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
           unzip -o chromedriver_linux64.zip
-          
-          # Move ChromeDriver to a directory in the system's PATH and ensure it's executable
           sudo mv chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
-      # Verify ChromeDriver version to ensure the correct one is installed
-      - name: Verify ChromeDriver version
+      - name: Check ChromeDriver path
         run: |
+          which chromedriver
           chromedriver --version
 
       # Run Maven tests
