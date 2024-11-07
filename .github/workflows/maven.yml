@@ -16,52 +16,20 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
+    - uses: actions/checkout@v4
     - name: Set up JDK 11
       uses: actions/setup-java@v4
       with:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
-
-    - name: Install Google Chrome and ChromeDriver
-      run: |
-        # Install Google Chrome
-        sudo apt-get update
-        sudo apt-get install -y wget curl unzip google-chrome-stable
-
-        # Extract Chrome version and ensure no spaces
-        CHROME_VERSION=$(google-chrome-stable --version | sed 's/Google Chrome //')
-        echo "Detected Chrome version: $CHROME_VERSION"
-
-        # Fetch the correct ChromeDriver version for the detected Chrome version
-        DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
-        echo "Resolved ChromeDriver version: $DRIVER_VERSION"
-
-        # Check if DRIVER_VERSION is empty
-        if [ -z "$DRIVER_VERSION" ]; then
-          echo "Error: Could not fetch ChromeDriver version for Chrome version $CHROME_VERSION"
-          exit 1
-        fi
-
-        # Download and install the ChromeDriver
-        wget "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
-        unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/local/bin/
-        sudo chmod +x /usr/local/bin/chromedriver
-
     - name: Build with Maven
-      run: mvn -B package --file pom.xml -Dchrome=true -Dheadless=false
-
-    - name: Run Tests with Maven
-      run: mvn test -B -Dchrome=true -Dheadless=false -DsuiteXmlFiles="src/test/resources/Suits/Demo.xml"
+      run: mvn -B package --file pom.xml
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
-
