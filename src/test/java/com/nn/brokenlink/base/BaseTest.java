@@ -109,19 +109,11 @@ public class BaseTest extends SkipUrls {
     private static WebDriver chromeDriver() {
         WebDriver driver;
         System.out.println("Launching Chrome Driver...");
-        System.setProperty("webdriver.http.factory", "jdk-http-client");
         ChromeOptions options = new ChromeOptions();
-        if (HEADLESS)
             options.addArguments("--headless");     //options.addArguments("--headless=new");
-        options.addArguments("--remote-allow-origins=*");
-        options.addArguments("--disable-notifications");
-        options.addArguments("--disable-infobars");
-        options.addArguments("--disable-extensions");
-        options.addArguments("--disable-popup-blocking");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
         driver = new ChromeDriver(options);
-        if (HEADLESS)
-            driver.manage().window().setSize(new Dimension(1920, 1080));
-        else
             driver.manage().window().maximize();
         return driver;
     }
