@@ -20,28 +20,19 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      # Install Google Chrome
+      # Install latest Google Chrome
       - name: Install Google Chrome
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
-      # Install ChromeDriver with fallback for compatibility
+      # Install the latest ChromeDriver
       - name: Install ChromeDriver
         run: |
-          CHROME_VERSION=$(google-chrome --version | grep -oE '[0-9]+(\.[0-9]+)+')
-          echo "Installed Google Chrome version: $CHROME_VERSION"
-          
-          # Try to fetch a compatible ChromeDriver version
-          DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION" || curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
-          
-          # Check if we successfully retrieved a driver version
-          if [[ "$DRIVER_VERSION" == *"Error"* ]] || [ -z "$DRIVER_VERSION" ]; then
-            echo "Failed to retrieve a compatible ChromeDriver version. Exiting."
-            exit 1
-          fi
-
+          # Fetch the latest ChromeDriver version
+          DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
           echo "Using ChromeDriver version: $DRIVER_VERSION"
+          
           wget "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
           unzip chromedriver_linux64.zip
           sudo mv chromedriver /usr/local/bin/
