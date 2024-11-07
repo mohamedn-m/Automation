@@ -12,7 +12,8 @@ public class Test {
 System.out.println("Hello world");
         options.addArguments("--headless");  // Run Chrome in headless mode
         options.addArguments("--no-sandbox");  // Required in CI environments
-        options.addArguments("--disable-dev-shm-usage");  // Prevents issues with limited memory
+        options.addArguments("--disable-dev-shm-usage"); 
+       WebDriver driver = new ChromeDriver(options);
        
    }
 }
