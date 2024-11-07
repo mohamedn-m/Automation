@@ -64,7 +64,7 @@ public class BaseTest extends SkipUrls {
     public static void quitRefresh(){
         System.out.println("Driver_Going_to_Refres");
         DriverManager.getDriver().quit();
-        WebDriver driver = setupBrowser("chrome");
+        WebDriver driver = setupBrowser();
         DriverManager.setDriver(driver);
         driver.manage().deleteAllCookies();
         System.out.println("Driver_Refreshed");
@@ -72,8 +72,8 @@ public class BaseTest extends SkipUrls {
     }
     @BeforeTest(alwaysRun = true)
     @Parameters({"BROWSER"})
-    public void createDriver(@Optional("chrome") String browser) {
-        WebDriver driver = setupBrowser(browser);
+    public void createDriver() {
+        WebDriver driver = setupBrowser();
         DriverManager.setDriver(driver);
     }
 
@@ -87,22 +87,9 @@ public class BaseTest extends SkipUrls {
     }
 
 
-    public static WebDriver setupBrowser(String browserName) {
+    public static WebDriver setupBrowser() {
         WebDriver driver;
-        switch (browserName.trim().toLowerCase()) {
-            case "chrome":
                 driver = chromeDriver();
-                break;
-            case "firefox":
-                driver = firefoxDriver();
-                break;
-            case "edge":
-                driver = edgeDriver();
-                break;
-            default:
-                System.out.println("Browser " + browserName + " name is invalid. Launching chrome as default");
-                driver = chromeDriver();
-        }
         return driver;
     }
 
