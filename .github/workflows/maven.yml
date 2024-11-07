@@ -21,14 +21,33 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
     - name: Set up JDK 11
       uses: actions/setup-java@v4
       with:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
+
+    # Set up Chrome and ChromeDriver
+    - name: Set up Chrome
+      uses: browser-actions/setup-chrome@v1
+    
+    - name: Set up ChromeDriver
+      uses: actions/setup-chromedriver@v1
+
+    # Set environment variables
+    - name: Set environment variables
+      run: echo "BROWSER=chrome" >> $GITHUB_ENV && echo "HEADLESS=true" >> $GITHUB_ENV
+
+    # Build and run the tests
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn -B package --file pom.xml -ea -DBROWSER=chrome -DHEADLESS=true
+
+    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+    - name: Update dependency graph
+      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
