@@ -56,7 +56,7 @@ public class HomePageTest extends BaseTest {
                 {"https://www.novalnet.de/mainp-sitemap.xml"},
                 {"https://www.novalnet.de/category-sitemap.xml"},
                 {"https://www.novalnet.de/post_tag-sitemap.xml"},
-                 {"https://www.novalnet.com/glossary_categories-sitemap.xml"}};
+                {"https://www.novalnet.com/glossary_categories-sitemap.xml"}};
     }
 
     //www.novalnet.com site map urls

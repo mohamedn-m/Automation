@@ -259,7 +259,7 @@ public class BaseTest extends SkipUrls {
             }
         }
 
-        }
+    }
 
 
     public void metaDataCheck() throws IOException, GeneralSecurityException {
@@ -294,8 +294,8 @@ public class BaseTest extends SkipUrls {
         for (String url : novalnetLinks) {
             DriverActions.openURL(url);
             if (url != null && !url.isEmpty() && url.contains("novalnet") && checkedURLs.add(url)) {
-               DriverActions.waitForPageLoad();
-               List<WebElement> h1Tags = DriverActions.getElements(By.xpath("//h1"));
+                DriverActions.waitForPageLoad();
+                List<WebElement> h1Tags = DriverActions.getElements(By.xpath("//h1"));
                 String lengthCondition = (h1Tags.size()<=1) ? "Yes" : "No";
                 writeDataToSheet(H1tagchecksheetname, new ArrayList<Object>(Arrays.asList(url, h1Tags.size(), lengthCondition)), xl);
             }
@@ -305,7 +305,7 @@ public class BaseTest extends SkipUrls {
 
     public void verifyImageAltAttributes() throws GeneralSecurityException, IOException {
         String altValue=null;
-      //  getSpreadsheetInstance();
+        //  getSpreadsheetInstance();
         List<String> novalnetLinks = getAllNovalnetLinks();
         List<List<Object>> dataToWrite = new ArrayList<>();
         for(String novalnetURL:novalnetLinks) {
@@ -315,14 +315,14 @@ public class BaseTest extends SkipUrls {
                 List<WebElement> images = DriverActions.getElements(By.xpath("//img"));
                 for (WebElement image : images) {
                     String imageURL = image.getAttribute("src");
-                     altValue = image.getAttribute("alt");
+                    altValue = image.getAttribute("alt");
 
                     if (urlsToSkip.contains(imageURL)) {
                         continue;
                     }
-                     if(altValue.isEmpty()){
-                         altValue="NIL";
-                     }
+                    if(altValue.isEmpty()){
+                        altValue="NIL";
+                    }
 
                     writeDataToSheet(imagealtchecksheetname, new ArrayList<Object>(Arrays.asList(novalnetURL, "YES", imageURL, altValue)), xl);
 

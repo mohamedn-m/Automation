@@ -11,8 +11,7 @@
 		<classes>
 			<class name = "com.nn.testcase.homepage.HomePageTest">
 				<methods>
-					<include name="brokenLink"/>
-				</methods>
+					<include name="H1TagChecker"/>				</methods>
 
 			</class>
 		</classes>
