@@ -34,7 +34,7 @@ jobs:
           echo "Using ChromeDriver version: $DRIVER_VERSION"
           
           wget "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
-          unzip chromedriver_linux64.zip
+          unzip -o chromedriver_linux64.zip  # Use -o to overwrite without prompt
           sudo mv chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
           
