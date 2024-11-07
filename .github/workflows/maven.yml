@@ -26,12 +26,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
-      # Force remove the old chromedriver if it exists in any location
-      - name: Force remove old ChromeDriver
+      # Force remove all possible locations of chromedriver
+      - name: Remove all previous chromedriver installations
         run: |
+          echo "Removing any existing chromedriver installations"
           sudo rm -f /usr/local/bin/chromedriver
           sudo rm -f /usr/bin/chromedriver
           sudo rm -f $(which chromedriver)
+          sudo find / -type f -name "chromedriver" -exec rm -f {} \;
+          echo "Removed all chromedriver installations."
 
       # Install compatible ChromeDriver
       - name: Install ChromeDriver
@@ -39,7 +42,7 @@ jobs:
           CHROME_VERSION=$(google-chrome --version | grep -oE '[0-9]+(\.[0-9]+)+')
           echo "Installed Google Chrome version: $CHROME_VERSION"
           
-          # Fetch the correct version of ChromeDriver based on the Chrome version
+          # Fetch a compatible ChromeDriver version based on the Chrome version
           DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION" || curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
           
           if [[ "$DRIVER_VERSION" == *"Error"* ]] || [ -z "$DRIVER_VERSION" ]; then
@@ -57,7 +60,7 @@ jobs:
           sudo mv chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
-      # Verify ChromeDriver version
+      # Verify ChromeDriver version to ensure the correct one is installed
       - name: Verify ChromeDriver version
         run: |
           chromedriver --version
