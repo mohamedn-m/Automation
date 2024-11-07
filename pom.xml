@@ -371,23 +371,17 @@
                     </configuration>
                 </plugin>
 
+ <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.0.0-M5</version>
+    <configuration>
+        <includes>
+            <include>com/nn/testcase/homepage/HomePageTest.java</include> <!-- Specify the full path to the test class -->
+        </includes>
+    </configuration>
+</plugin>
 
-=======
-  <plugin>
->>>>>>> 2a0f950f967d1e94458d91c879021da28fbd96bf
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M5</version>
-                    <configuration>
-                        <suiteXmlFiles>
-                            <suiteXmlFile>Suits/Demo.xml</suiteXmlFile>
-                        </suiteXmlFiles>
-                    </configuration>
-                </plugin>
-
-
-=======
->>>>>>> 2a0f950f967d1e94458d91c879021da28fbd96bf
 
 
             </plugins>
