@@ -26,10 +26,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
-      # Remove the old ChromeDriver if it exists
-      - name: Remove old ChromeDriver if exists
+      # Force remove the old chromedriver if it exists in any location
+      - name: Force remove old ChromeDriver
         run: |
           sudo rm -f /usr/local/bin/chromedriver
+          sudo rm -f /usr/bin/chromedriver
+          sudo rm -f $(which chromedriver)
 
       # Install compatible ChromeDriver
       - name: Install ChromeDriver
@@ -54,6 +56,11 @@ jobs:
           # Move ChromeDriver to a directory in the system's PATH and ensure it's executable
           sudo mv chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
+
+      # Verify ChromeDriver version
+      - name: Verify ChromeDriver version
+        run: |
+          chromedriver --version
 
       # Run Maven tests
       - name: Build and Test with Maven
