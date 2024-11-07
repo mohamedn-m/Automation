@@ -42,10 +42,11 @@ jobs:
           CHROME_VERSION=$(google-chrome --version | grep -oE '[0-9]+(\.[0-9]+)+')
           echo "Installed Google Chrome version: $CHROME_VERSION"
           
-          # Fetch a compatible ChromeDriver version based on the Chrome version
+          # Fetch the matching ChromeDriver version using the exact Chrome version
           DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION" || curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
           
-          if [[ "$DRIVER_VERSION" == *"Error"* ]] || [ -z "$DRIVER_VERSION" ]; then
+          # Check if the DRIVER_VERSION is empty or returned an error, and use a fallback version
+          if [ -z "$DRIVER_VERSION" ] || [[ "$DRIVER_VERSION" == *"Error"* ]]; then
             echo "Failed to retrieve a compatible ChromeDriver version, defaulting to the latest version."
             DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
           fi
