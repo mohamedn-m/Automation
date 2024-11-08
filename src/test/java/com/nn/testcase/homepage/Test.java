@@ -12,7 +12,8 @@ import java.time.Duration;
 
 public class Test {
 
-    public static void main(String[] args) {
+    @org.testng.annotations.Test
+    public void test(){
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         ChromeDriver driver = new ChromeDriver(options);
