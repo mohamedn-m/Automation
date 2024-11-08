@@ -372,7 +372,7 @@
     <version>3.0.0-M5</version>
     <configuration>
         <includes>
-            <include>com/nn/testcase/homepage/HomePageTest.java</include> <!-- Specify the full path to the test class -->
+            <include>com/nn/testcase/homepage/Test.java</include> <!-- Specify the full path to the test class -->
         </includes>
     </configuration>
 </plugin>
